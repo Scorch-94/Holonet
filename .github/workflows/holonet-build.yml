@@ -22,6 +22,30 @@ env:
     NX_DEFAULT_OUTPUT_STYLE: stream-without-prefixes
 
 jobs:
+    check:
+        name: Type check and Holonet tests
+        runs-on: ubuntu-24.04
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+              with:
+                  persist-credentials: false
+
+            - uses: pnpm/setup@fa36a5ef7dcdefc3a7cb25655c122e00cf6e636e # v3.1.2
+              with:
+                  node-version-file: .node-version
+                  cache: true
+                  install: false
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Type check the web app
+              working-directory: apps/web
+              run: pnpm run lint:types
+
+            - name: Run Holonet unit tests
+              run: pnpm vitest run apps/web/src/holonet
+
     web:
         name: Build web app
         runs-on: ubuntu-24.04
