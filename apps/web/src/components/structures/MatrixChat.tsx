@@ -56,6 +56,7 @@ import PageType from "../../PageTypes";
 import createRoom, { type IOpts } from "../../createRoom";
 import { _t, _td } from "../../languageHandler";
 import SettingsStore from "../../settings/SettingsStore";
+import { startHelpSectionSeeder } from "../../holonet/HelpSectionSeeder";
 import { startAnyRegistrationFlow } from "../../Registration";
 import AutoDiscoveryUtils from "../../utils/AutoDiscoveryUtils";
 import { calculateRoomVia, makeRoomPermalink } from "../../utils/permalinks/Permalinks";
@@ -1823,6 +1824,9 @@ export default class MatrixChat extends React.PureComponent<IProps, IState> {
                 },
             );
         }
+
+        // Holonet: set up the Help section once the room list knows about the member's rooms
+        void this.firstSyncPromise.promise.then(() => startHelpSectionSeeder(cli));
 
         const shouldForceVerification = await this.shouldForceVerification();
 

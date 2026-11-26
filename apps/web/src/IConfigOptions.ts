@@ -23,6 +23,17 @@ export interface ConfigOptions extends WebConfigJson {
      * This is not a real config field, we're just abusing the config structure to pass around a validated server config
      */
     validated_server_config?: ValidatedServerConfig;
+
+    /**
+     * Holonet: a Help section created in every member's room list on first start. Members can
+     * collapse it, move rooms out of it or delete it, and those choices are kept.
+     */
+    holonet_help_section?: {
+        /** Name of the section. Defaults to "Help". */
+        name?: string;
+        /** Room ids (`!id:server`) or aliases (`#alias:server`) of the rooms to put in the section. */
+        rooms: string[];
+    };
 }
 
 /**
