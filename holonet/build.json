@@ -1,0 +1,9 @@
+{
+    "appId": "cloud.trevors.holonet",
+    "name": "holonet-desktop",
+    "productName": "Holonet",
+    "description": "Holonet: chat for the Galactic Empire community",
+    "protocols": [
+        "holonet"
+    ]
+}

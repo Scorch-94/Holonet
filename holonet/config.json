@@ -1,0 +1,81 @@
+{
+    "default_server_config": {
+        "m.homeserver": {
+            "base_url": "https://matrix.trevors.cloud",
+            "server_name": "trevors.cloud"
+        }
+    },
+    "brand": "Holonet",
+    "disable_custom_urls": false,
+    "disable_guests": true,
+    "force_verification": true,
+    "default_country_code": "US",
+    "show_labs_settings": false,
+    "default_federate": true,
+    "room_directory": {
+        "servers": [
+            "trevors.cloud"
+        ]
+    },
+    "default_theme": "custom-Holonet Dark",
+    "setting_defaults": {
+        "breadcrumbs": true,
+        "use_system_theme": false,
+        "custom_themes": [
+            {
+                "name": "Holonet Dark",
+                "is_dark": true,
+                "fonts": {
+                    "general": "Inter, \"Segoe UI\", sans-serif",
+                    "monospace": "\"Fira Code\", Consolas, monospace"
+                },
+                "colors": {
+                    "accent-color": "#7c6cf2",
+                    "primary-color": "#7c6cf2",
+                    "warning-color": "#f0475a",
+                    "sidebar-color": "#1c1d21",
+                    "roomlist-background-color": "#26282d",
+                    "roomlist-text-color": "#aeb3bc",
+                    "roomlist-text-secondary-color": "#f0f1f4",
+                    "roomlist-highlights-color": "#34363d",
+                    "roomlist-separator-color": "#3a3c43",
+                    "timeline-background-color": "#2e3036",
+                    "timeline-text-color": "#dcdfe4",
+                    "timeline-text-secondary-color": "#959ba6",
+                    "timeline-highlights-color": "#363840",
+                    "username-colors": [
+                        "#a594ff",
+                        "#5fb3f9",
+                        "#4fd1a5",
+                        "#f5b545",
+                        "#f27a8a",
+                        "#e58bf2",
+                        "#6fd3e3",
+                        "#c3d36b"
+                    ],
+                    "avatar-background-colors": [
+                        "#5b4fd1",
+                        "#2f7fc4",
+                        "#2a9d78",
+                        "#c3832a",
+                        "#b8485a",
+                        "#9b4fc4",
+                        "#2f9fb0",
+                        "#7a8a2f"
+                    ]
+                },
+                "compound": {
+                    "--cpd-color-text-action-accent": "#a594ff",
+                    "--cpd-color-icon-accent-primary": "#a594ff",
+                    "--cpd-color-icon-accent-tertiary": "#a594ff",
+                    "--cpd-color-bg-accent-rest": "#7c6cf2"
+                }
+            }
+        ]
+    },
+    "element_call": {
+        "brand": "Element Call",
+        "disable": false,
+        "use_exclusively": false
+    }
+}

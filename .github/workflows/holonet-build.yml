@@ -1,0 +1,106 @@
+# Builds the Holonet fork: the web app on Linux, then the Windows desktop installer.
+# Trigger: every push to the holonet branch, or manually from the Actions tab ("Run workflow").
+# Output: two downloadable artifacts on the run's summary page:
+#   - holonet-webapp      (static files to serve from Caddy)
+#   - holonet-windows-x64 (the Windows installer, Holonet Setup <version>.exe)
+
+name: Holonet build
+
+on:
+    push:
+        branches: [holonet]
+    workflow_dispatch: {}
+
+concurrency:
+    group: holonet-build-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+env:
+    NX_DEFAULT_OUTPUT_STYLE: stream-without-prefixes
+
+jobs:
+    web:
+        name: Build web app
+        runs-on: ubuntu-24.04
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+              with:
+                  persist-credentials: false
+
+            - uses: pnpm/setup@fa36a5ef7dcdefc3a7cb25655c122e00cf6e636e # v3.1.2
+              with:
+                  node-version-file: .node-version
+                  cache: true
+                  install: false
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Use Holonet config
+              run: cp holonet/config.json apps/web/config.json
+
+            - name: Build
+              working-directory: apps/web
+              env:
+                  CI_PACKAGE: true
+              run: pnpm run build
+
+            - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+              with:
+                  name: holonet-webapp
+                  path: apps/web/webapp
+                  retention-days: 14
+
+    windows:
+        name: Build Windows installer
+        needs: web
+        runs-on: windows-2025
+        defaults:
+            run:
+                shell: bash
+        env:
+            # Only the desktop app's deps are installed; stop pnpm reinstalling the whole workspace
+            PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: "false"
+            # No code-signing certificate yet: build unsigned (members will see a SmartScreen prompt)
+            CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+              with:
+                  persist-credentials: false
+
+            - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+              with:
+                  name: holonet-webapp
+                  path: apps/desktop/webapp
+
+            - uses: pnpm/setup@fa36a5ef7dcdefc3a7cb25655c122e00cf6e636e # v3.1.2
+              with:
+                  node-version-file: apps/desktop/.node-version
+                  cache: true
+                  install: false
+
+            - name: Install dependencies
+              working-directory: apps/desktop
+              run: pnpm install --frozen-lockfile --filter element-desktop
+
+            - name: Package web app into the desktop app
+              working-directory: apps/desktop
+              run: |
+                  cp ../../holonet/config.json webapp/config.json
+                  pnpm run asar-webapp
+
+            - name: Build installer
+              working-directory: apps/desktop
+              env:
+                  VARIANT_PATH: ../../holonet/build.json
+              run: pnpm run build --publish never -w squirrel
+
+            - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+              with:
+                  name: holonet-windows-x64
+                  path: |
+                      apps/desktop/dist/squirrel-windows/*.exe
+                  retention-days: 14
