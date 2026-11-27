@@ -1,5 +1,7 @@
 # Builds the Holonet fork: the web app on Linux, then the Windows desktop installer.
 # Trigger: every push to the holonet branch, or manually from the Actions tab ("Run workflow").
+# Tick "Publish this build as a GitHub Release" when running it manually to publish the installer
+# on the repo's Releases page, where the download link doesn't expire.
 # Output: two downloadable artifacts on the run's summary page:
 #   - holonet-webapp      (static files to serve from Caddy)
 #   - holonet-windows-x64 (the Windows installer, Holonet Setup <version>.exe)
@@ -9,7 +11,12 @@ name: Holonet build
 on:
     push:
         branches: [holonet]
-    workflow_dispatch: {}
+    workflow_dispatch:
+        inputs:
+            publish_release:
+                description: "Publish this build as a GitHub Release (permanent download link)"
+                type: boolean
+                default: false
 
 concurrency:
     group: holonet-build-${{ github.ref }}
@@ -128,3 +135,38 @@ jobs:
                   path: |
                       apps/desktop/dist/squirrel-windows/*.exe
                   retention-days: 14
+
+    release:
+        name: Publish GitHub Release
+        needs: windows
+        if: github.event_name == 'workflow_dispatch' && inputs.publish_release
+        runs-on: ubuntu-24.04
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+              with:
+                  path: artifacts
+
+            - name: Create release
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GH_REPO: ${{ github.repository }}
+                  RUN_NUMBER: ${{ github.run_number }}
+                  SHA: ${{ github.sha }}
+              run: |
+                  set -euo pipefail
+                  installer=$(find artifacts/holonet-windows-x64 -name '*.exe' | head -n 1)
+                  # Element version from the installer name, e.g. "Holonet Setup 1.12.36.exe" -> 1.12.36
+                  element_version=$(basename "$installer" .exe | sed 's/^Holonet Setup //')
+                  tag="v${element_version}-holonet.${RUN_NUMBER}"
+
+                  cp "$installer" "Holonet-Setup-${element_version}-holonet.${RUN_NUMBER}.exe"
+                  tar -czf "holonet-webapp-${element_version}-holonet.${RUN_NUMBER}.tar.gz" -C artifacts/holonet-webapp .
+
+                  gh release create "$tag" \
+                      --target "$SHA" \
+                      --title "Holonet ${element_version} (build ${RUN_NUMBER})" \
+                      --notes "Windows installer and web build, based on Element ${element_version}. The installer isn't code-signed yet: on the SmartScreen prompt, choose **More info → Run anyway**." \
+                      "Holonet-Setup-${element_version}-holonet.${RUN_NUMBER}.exe" \
+                      "holonet-webapp-${element_version}-holonet.${RUN_NUMBER}.tar.gz"
