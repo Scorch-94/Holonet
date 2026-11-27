@@ -81,8 +81,9 @@
     "holonet_help_section": {
         "name": "Help",
         "rooms": [
+            "#faq:trevors.cloud",
             "#holonethelp:trevors.cloud",
-            "!WlfuybkDOlzEElHPqT:trevors.cloud"
+            "#support-empire:trevors.cloud"
         ]
     }
 }
