@@ -77,5 +77,12 @@
         "brand": "Element Call",
         "disable": false,
         "use_exclusively": false
+    },
+    "holonet_help_section": {
+        "name": "Help",
+        "rooms": [
+            "#holonethelp:trevors.cloud",
+            "!WlfuybkDOlzEElHPqT:trevors.cloud"
+        ]
     }
 }
