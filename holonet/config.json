@@ -85,5 +85,33 @@
             "#holonethelp:trevors.cloud",
             "#support-empire:trevors.cloud"
         ]
+    },
+    "branding": {
+        "auth_header_logo_url": "vector-icons/holonet-logo.svg",
+        "logo_link_url": "https://signup.trevors.cloud",
+        "auth_footer_links": [
+            {
+                "text": "Signup guide",
+                "url": "https://signup.trevors.cloud"
+            },
+            {
+                "text": "Help Desk",
+                "url": "https://matrix.to/#/#holonethelp:trevors.cloud"
+            }
+        ]
+    },
+    "help_url": "https://matrix.to/#/#holonethelp:trevors.cloud",
+    "feedback": {
+        "existing_issues_url": "https://matrix.to/#/#holonethelp:trevors.cloud",
+        "new_issue_url": "https://matrix.to/#/#holonethelp:trevors.cloud"
+    },
+    "desktop_builds": {
+        "available": true,
+        "logo": "vector-icons/1024.png",
+        "url": "https://github.com/Scorch-94/Holonet/releases/latest",
+        "url_win64": "https://github.com/Scorch-94/Holonet/releases/latest",
+        "url_macos": "",
+        "url_win64arm": "",
+        "url_linux": ""
     }
 }
