@@ -1,0 +1,46 @@
+# MatrixRTC backend for trevors.cloud: LiveKit (media) + lk-jwt-service (auth) + Caddy (HTTPS).
+# Intended for a small public Linux VPS. See README.md before deploying.
+#
+# LiveKit uses host networking so its UDP media ports reach the internet directly;
+# Docker's port publishing is slow and unreliable for large UDP ranges.
+
+services:
+    livekit:
+        image: livekit/livekit-server:latest
+        command: --config /etc/livekit.yaml
+        restart: unless-stopped
+        network_mode: host
+        environment:
+            # "key: secret", from .env. The key name must match LIVEKIT_KEY below and webhook.api_key in livekit.yaml.
+            LIVEKIT_KEYS: "${LIVEKIT_KEY}: ${LIVEKIT_SECRET}"
+        volumes:
+            - ./livekit.yaml:/etc/livekit.yaml:ro
+
+    lk-jwt-service:
+        image: ghcr.io/element-hq/lk-jwt-service:latest
+        restart: unless-stopped
+        environment:
+            LIVEKIT_JWT_BIND: ":8080"
+            LIVEKIT_URL: "wss://${RTC_DOMAIN}/livekit/sfu"
+            LIVEKIT_KEY: "${LIVEKIT_KEY}"
+            LIVEKIT_SECRET: "${LIVEKIT_SECRET}"
+            # Only accounts on trevors.cloud may start calls on this server
+            LIVEKIT_FULL_ACCESS_HOMESERVERS: "${MATRIX_SERVER_NAME}"
+        ports:
+            # Reachable only from this machine (Caddy and LiveKit's webhook)
+            - "127.0.0.1:8080:8080"
+
+    caddy:
+        image: caddy:2
+        restart: unless-stopped
+        network_mode: host
+        environment:
+            RTC_DOMAIN: "${RTC_DOMAIN}"
+        volumes:
+            - ./Caddyfile:/etc/caddy/Caddyfile:ro
+            - caddy_data:/data
+            - caddy_config:/config
+
+volumes:
+    caddy_data:
+    caddy_config:

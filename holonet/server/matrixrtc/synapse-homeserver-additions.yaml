@@ -1,0 +1,28 @@
+# Add to Synapse's homeserver.yaml (merge into existing sections if they already exist),
+# then restart Synapse. Back up homeserver.yaml first.
+
+experimental_features:
+    msc3266_enabled: true # room summary API, used by Element Call
+    msc4222_enabled: true # state_after in sync, keeps call membership accurate
+    msc4140_enabled: true # delayed events: removes people who disconnect from the call
+    msc4143_enabled: true # lets clients ask Synapse where the LiveKit backend is
+
+# Longest a delayed event may be scheduled. Without delayed events, calls get "stuck" showing
+# people who already left.
+max_event_delay_duration: 24h
+
+# Where clients find the LiveKit backend
+matrix_rtc:
+    transports:
+        - type: livekit
+          livekit_service_url: "https://rtc.trevors.cloud/livekit/jwt"
+
+# Calls send encryption keys and heartbeats in bursts. If these sections already exist, keep
+# whichever values are higher.
+rc_message:
+    per_second: 0.5
+    burst_count: 30
+
+rc_delayed_event_mgmt:
+    per_second: 1
+    burst_count: 20

@@ -1,0 +1,14 @@
+# HTTPS for the MatrixRTC backend. Caddy gets the certificate automatically.
+{$RTC_DOMAIN} {
+    # Matrix clients ask here for a LiveKit token (this is the livekit_service_url)
+    handle_path /livekit/jwt/* {
+        reverse_proxy 127.0.0.1:8080
+    }
+
+    # Clients connect to the LiveKit SFU here over WebSocket
+    handle_path /livekit/sfu/* {
+        reverse_proxy 127.0.0.1:7880
+    }
+
+    respond 404
+}

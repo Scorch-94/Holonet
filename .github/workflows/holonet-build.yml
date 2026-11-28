@@ -11,6 +11,9 @@ name: Holonet build
 on:
     push:
         branches: [holonet]
+        # Server setup files don't affect the app, so changing them doesn't need a build
+        paths-ignore:
+            - "holonet/server/**"
     workflow_dispatch:
         inputs:
             publish_release:

@@ -1,0 +1,26 @@
+# LiveKit SFU config. API keys come from the LIVEKIT_KEYS environment variable (see docker-compose.yml),
+# so no secrets live in this file.
+
+port: 7880
+bind_addresses:
+    - "127.0.0.1" # only Caddy talks to the API; media ports below are public
+
+rtc:
+    tcp_port: 7881
+    port_range_start: 50100
+    port_range_end: 50200
+    # Discover the VPS's public IP over STUN and advertise it to clients
+    use_external_ip: true
+
+room:
+    # Rooms are created by lk-jwt-service for authorised trevors.cloud members only
+    auto_create: false
+
+webhook:
+    # Must match LIVEKIT_KEY in .env
+    api_key: holonet
+    urls:
+        - http://127.0.0.1:8080/sfu_webhook
+
+logging:
+    level: info
